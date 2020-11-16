@@ -17,6 +17,10 @@
 
 static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 
+@interface MWPhotoBrowser () <AVPlayerViewControllerDelegate>
+
+@end
+
 @implementation MWPhotoBrowser
 
 #pragma mark - Init
@@ -1164,6 +1168,11 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     return index;
 }
 
+#pragma mark - AVPlayerViewControllerDelegate
+- (BOOL)playerViewControllerShouldAutomaticallyDismissAtPictureInPictureStart:(AVPlayerViewController *)playerViewController {
+    return YES;
+}
+
 #pragma mark - Video
 
 - (void)playVideoAtIndex:(NSUInteger)index {
@@ -1199,24 +1208,32 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 - (void)_playVideo:(NSURL *)videoURL atPhotoIndex:(NSUInteger)index {
 
     // Setup player
-    _currentVideoPlayerViewController = [[MPMoviePlayerViewController alloc] initWithContentURL:videoURL];
-    [_currentVideoPlayerViewController.moviePlayer prepareToPlay];
-    _currentVideoPlayerViewController.moviePlayer.shouldAutoplay = YES;
-    _currentVideoPlayerViewController.moviePlayer.scalingMode = MPMovieScalingModeAspectFit;
+    _currentVideoPlayerViewController = [[AVPlayerViewController alloc] init];
+    _currentVideoPlayerViewController.delegate = self;
+    AVPlayer *player = [AVPlayer playerWithURL:videoURL];
+    
+    _currentVideoPlayerViewController.player = player;
+    _currentVideoPlayerViewController.allowsPictureInPicturePlayback = YES;
+    
+//    [_currentVideoPlayerViewController.moviePlayer prepareToPlay];
+//    _currentVideoPlayerViewController.moviePlayer.shouldAutoplay = YES;
+//    _currentVideoPlayerViewController.moviePlayer.scalingMode = MPMovieScalingModeAspectFit;
     _currentVideoPlayerViewController.modalTransitionStyle = UIModalTransitionStyleCrossDissolve;
     
     // Remove the movie player view controller from the "playback did finish" notification observers
     // Observe ourselves so we can get it to use the crossfade transition
-    [[NSNotificationCenter defaultCenter] removeObserver:_currentVideoPlayerViewController
-                                                    name:MPMoviePlayerPlaybackDidFinishNotification
-                                                  object:_currentVideoPlayerViewController.moviePlayer];
+//    [[NSNotificationCenter defaultCenter] removeObserver:_currentVideoPlayerViewController.player
+//                                                    name:MPMoviePlayerPlaybackDidFinishNotification
+//                                                  object:_currentVideoPlayerViewController.moviePlayer];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(videoFinishedCallback:)
-                                                 name:MPMoviePlayerPlaybackDidFinishNotification
-                                               object:_currentVideoPlayerViewController.moviePlayer];
+                                                 name:AVPlayerItemDidPlayToEndTimeNotification
+                                               object:_currentVideoPlayerViewController.player.currentItem];
 
     // Show
     [self presentViewController:_currentVideoPlayerViewController animated:YES completion:nil];
+    
+    _currentVideoIndex = NSUIntegerMax;
 
 }
 
@@ -1224,27 +1241,28 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     
     // Remove observer
     [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:MPMoviePlayerPlaybackDidFinishNotification
-                                                  object:_currentVideoPlayerViewController.moviePlayer];
+                                                    name:AVPlayerItemDidPlayToEndTimeNotification
+                                                  object:_currentVideoPlayerViewController.player.currentItem];
     
     // Clear up
     [self clearCurrentVideo];
     
     // Dismiss
-    BOOL error = [[[notification userInfo] objectForKey:MPMoviePlayerPlaybackDidFinishReasonUserInfoKey] intValue] == MPMovieFinishReasonPlaybackError;
-    if (error) {
-        // Error occured so dismiss with a delay incase error was immediate and we need to wait to dismiss the VC
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-            [self dismissViewControllerAnimated:YES completion:nil];
-        });
-    } else {
-        [self dismissViewControllerAnimated:YES completion:nil];
-    }
+//    BOOL error = [[[notification userInfo] objectForKey:MPMoviePlayerPlaybackDidFinishReasonUserInfoKey] intValue] == MPMovieFinishReasonPlaybackError;
+//    if (error) {
+//        // Error occured so dismiss with a delay incase error was immediate and we need to wait to dismiss the VC
+//        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//            [self dismissViewControllerAnimated:YES completion:nil];
+//        });
+//    } else {
+//        [self dismissViewControllerAnimated:YES completion:nil];
+//    }
     
 }
 
 - (void)clearCurrentVideo {
-    [_currentVideoPlayerViewController.moviePlayer stop];
+//    [_currentVideoPlayerViewController.moviePlayer stop];
+    [_currentVideoPlayerViewController.player pause];
     [_currentVideoLoadingIndicator removeFromSuperview];
     _currentVideoPlayerViewController = nil;
     _currentVideoLoadingIndicator = nil;
@@ -1258,12 +1276,12 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
         _currentVideoLoadingIndicator = nil;
         [[self pageDisplayedAtIndex:pageIndex] playButton].hidden = NO;
     } else if (!_currentVideoLoadingIndicator && visible) {
-        _currentVideoLoadingIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectZero];
-        [_currentVideoLoadingIndicator sizeToFit];
-        [_currentVideoLoadingIndicator startAnimating];
-        [_pagingScrollView addSubview:_currentVideoLoadingIndicator];
-        [self positionVideoLoadingIndicator];
-        [[self pageDisplayedAtIndex:pageIndex] playButton].hidden = YES;
+//        _currentVideoLoadingIndicator = [[UIActivityIndicatorView alloc] initWithFrame:CGRectZero];
+//        [_currentVideoLoadingIndicator sizeToFit];
+//        [_currentVideoLoadingIndicator startAnimating];
+//        [_pagingScrollView addSubview:_currentVideoLoadingIndicator];
+//        [self positionVideoLoadingIndicator];
+//        [[self pageDisplayedAtIndex:pageIndex] playButton].hidden = YES;
     }
 }
 
