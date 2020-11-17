@@ -1230,7 +1230,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
                                                  name:AVPlayerItemDidPlayToEndTimeNotification
                                                object:_currentVideoPlayerViewController.player.currentItem];
 
-    // Show
+    // Show1
     [self presentViewController:_currentVideoPlayerViewController animated:YES completion:nil];
     
     _currentVideoIndex = NSUIntegerMax;
