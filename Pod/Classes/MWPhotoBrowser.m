@@ -1088,7 +1088,10 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
     
     // Disable action button if there is no image or it's a video
     MWPhoto *photo = [self photoAtIndex:_currentPageIndex];
-    if ([photo underlyingImage] == nil || ([photo respondsToSelector:@selector(isVideo)] && photo.isVideo)) {
+    if ([photo underlyingImage] == nil
+//        || ([photo respondsToSelector:@selector(isVideo)] && photo.isVideo)
+        )
+    {
         _actionButton.enabled = NO;
         _actionButton.tintColor = [UIColor clearColor]; // Tint to hide button
     } else {
@@ -1230,7 +1233,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
                                                  name:AVPlayerItemDidPlayToEndTimeNotification
                                                object:_currentVideoPlayerViewController.player.currentItem];
 
-    // Show1
+    // Show
     [self presentViewController:_currentVideoPlayerViewController animated:YES completion:nil];
     
     _currentVideoIndex = NSUIntegerMax;
