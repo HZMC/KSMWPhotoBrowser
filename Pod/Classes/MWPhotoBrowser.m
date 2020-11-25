@@ -1235,7 +1235,7 @@ static void * MWVideoPlayerObservation = &MWVideoPlayerObservation;
 
     // Show
     [self presentViewController:_currentVideoPlayerViewController animated:YES completion:nil];
-    
+    [player play];
     _currentVideoIndex = NSUIntegerMax;
 
 }
