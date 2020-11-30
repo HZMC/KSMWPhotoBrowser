@@ -11,6 +11,8 @@
 #import <MediaPlayer/MediaPlayer.h>
 #import "MWGridViewController.h"
 #import "MWZoomingScrollView.h"
+#import "TPPlayVideoCtl.h"
+
 @import AVKit;
 
 // Declare private methods of browser
@@ -56,7 +58,9 @@
     
     // Video
 //    MPMoviePlayerViewController *_currentVideoPlayerViewController;
-    AVPlayerViewController *_currentVideoPlayerViewController;
+//    AVPlayerViewController *_currentVideoPlayerViewController;
+    TPPlayVideoCtl *_currentVideoPlayerViewController;
+    
     NSUInteger _currentVideoIndex;
     UIActivityIndicatorView *_currentVideoLoadingIndicator;
     

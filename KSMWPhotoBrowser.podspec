@@ -42,4 +42,12 @@ Pod::Spec.new do |s|
   s.dependency 'DACircularProgress'
   s.dependency 'SDWebImage'
 
+  s.static_framework = true
+
+  s.dependency 'ZFPlayer', '~> 3.3.0'
+  s.dependency 'ZFPlayer/ControlView', '~> 3.3.0'
+  s.dependency 'ZFPlayer/AVPlayer', '~> 3.3.0'
+  s.dependency 'Masonry'
+  s.dependency 'KTVHTTPCache', '~> 2.1.0'
+  
 end
