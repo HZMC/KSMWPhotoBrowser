@@ -36,6 +36,7 @@ static void inline mw_dispatch_async(void (^_Nonnull block)(void))
 - (void)viewDidLoad {
     [super viewDidLoad];
     ZFAVPlayerManager *man = [[ZFAVPlayerManager alloc] init];
+    man.requestHeader = @{@"AVURLAssetHTTPHeaderFieldsKey" : self.customHeader?:@{}};
     _playCtl = [ZFPlayerController playerWithPlayerManager:man containerView:self.view];
     ZFPlayerControlView *ctlview = [ZFPlayerControlView new];
     _playCtl.controlView = ctlview;

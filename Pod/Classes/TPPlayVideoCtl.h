@@ -13,6 +13,7 @@ typedef void (^TPPlayOverCall)(void);
 
 @interface TPPlayVideoCtl : UIViewController
 @property (nonatomic, copy) TPPlayOverCall playDone;
+@property (nonatomic, strong) NSDictionary *customHeader;
 
 - (instancetype)initWithVideoUrl:(NSURL *)videoLink;
 

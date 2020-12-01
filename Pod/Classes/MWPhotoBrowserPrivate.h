@@ -57,7 +57,6 @@
     UIImage *_previousNavigationBarBackgroundImageLandscapePhone;
     
     // Video
-//    MPMoviePlayerViewController *_currentVideoPlayerViewController;
 //    AVPlayerViewController *_currentVideoPlayerViewController;
     TPPlayVideoCtl *_currentVideoPlayerViewController;
     
