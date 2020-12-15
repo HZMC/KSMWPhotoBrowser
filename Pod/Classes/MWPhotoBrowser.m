@@ -1194,7 +1194,7 @@ static void *MWVideoPlayerObservation = &MWVideoPlayerObservation;
 //    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(videoFinishedCallback:) name:AVPlayerItemDidPlayToEndTimeNotification object:_currentVideoPlayerViewController.player.currentItem];
 //    [self presentViewController:_currentVideoPlayerViewController animated:YES completion:nil];
 //    [player play];
-    
+
     _currentVideoIndex = NSUIntegerMax;
 }
 
@@ -1530,38 +1530,56 @@ static void *MWVideoPlayerObservation = &MWVideoPlayerObservation;
             [self.delegate photoBrowser:self actionButtonPressedForPhotoAtIndex:_currentPageIndex];
         } else {
             // Show activity view controller
-            NSMutableArray *items = [NSMutableArray arrayWithObject:[photo underlyingImage]];
-            if (photo.caption) {
-                [items addObject:photo.caption];
-            }
-            self.activityViewController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:nil];
+            NSMutableArray *items = @[].mutableCopy;
+            
+            if ([photo isVideo]) {
+                [photo getVideoURL:^(NSURL *url) {
+                    [items addObject:url];
 
-            // Show loading spinner after a couple of seconds
-            double delayInSeconds = 2.0;
-            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-            dispatch_after(popTime, dispatch_get_main_queue(), ^(void) {
-                if (self.activityViewController) {
-                    [self showProgressHUDWithMessage:nil];
-                }
-            });
-
-            // Show
-            typeof(self) __weak weakSelf = self;
-            [self.activityViewController setCompletionWithItemsHandler:^(UIActivityType _Nullable activityType, BOOL completed, NSArray *_Nullable returnedItems, NSError *_Nullable activityError) {
-                weakSelf.activityViewController = nil;
-                [weakSelf hideControlsAfterDelay];
-                [weakSelf hideProgressHUD:YES];
-            }];
-            // iOS 8 - Set the Anchor Point for the popover
-            if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8")) {
-                self.activityViewController.popoverPresentationController.barButtonItem = _actionButton;
+                    double delayInSeconds = 0.1;
+                    dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+                    dispatch_after(popTime, dispatch_get_main_queue(), ^(void) {
+                                       [self showActionsWithItems:items];
+                                   });
+                }];
+            } else {
+                [items addObject:[photo underlyingImage]];
+                [self showActionsWithItems:items];
             }
-            [self presentViewController:self.activityViewController animated:YES completion:nil];
+//            if (photo.caption) {
+//                [items addObject:photo.caption];
+//            }
         }
 
         // Keep controls hidden
         [self setControlsHidden:NO animated:YES permanent:YES];
     }
+}
+
+- (void)showActionsWithItems:(NSArray *)items {
+    self.activityViewController = [[UIActivityViewController alloc] initWithActivityItems:items applicationActivities:nil];
+
+    // Show loading spinner after a couple of seconds
+//            double delayInSeconds = 2.0;
+//            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+//            dispatch_after(popTime, dispatch_get_main_queue(), ^(void) {
+//                if (self.activityViewController) {
+//                    [self showProgressHUDWithMessage:nil];
+//                }
+//            });
+
+    // Show
+    typeof(self) __weak weakSelf = self;
+    [self.activityViewController setCompletionWithItemsHandler:^(UIActivityType _Nullable activityType, BOOL completed, NSArray *_Nullable returnedItems, NSError *_Nullable activityError) {
+        weakSelf.activityViewController = nil;
+        [weakSelf hideControlsAfterDelay];
+        [weakSelf hideProgressHUD:YES];
+    }];
+    // iOS 8 - Set the Anchor Point for the popover
+    if (SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO(@"8")) {
+        self.activityViewController.popoverPresentationController.barButtonItem = _actionButton;
+    }
+    [self presentViewController:self.activityViewController animated:YES completion:nil];
 }
 
 #pragma mark - Action Progress
